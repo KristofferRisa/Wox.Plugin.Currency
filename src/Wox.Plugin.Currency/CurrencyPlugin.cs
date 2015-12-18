@@ -14,7 +14,6 @@ namespace Wox.Plugin.Currency
     {
         #region private fields
         private PluginInitContext _context;
-        private Models.Currency _localCurrency;
         private Models.Currency _currency;
         private string localISOSymbol => RegionInfo.CurrentRegion.ISOCurrencySymbol;
         #endregion
@@ -34,26 +33,21 @@ namespace Wox.Plugin.Currency
                         //inputs
                         var money = Convert.ToDecimal(query.FirstSearch);
                         toCurrency = query.SecondSearch.ToUpper();
-                        if ((_localCurrency == null 
-                            || Convert.ToDateTime(_localCurrency.date) < DateTime.Today)
-                            && Enum.IsDefined(typeof(RateList),query.SecondSearch.ToUpper()))
+                        if (Enum.IsDefined(typeof(RateList),query.SecondSearch.ToUpper()))
                         {
                             //Checks if inputs exists in enum
-                            _localCurrency = GetCurrency();
-                            var rate = _localCurrency.GetRate(toCurrency);
-                            result = money * rate;  
-                        }
-                        if (_localCurrency != null)
-                        {
+                            _currency = GetCurrency(toCurrency);
                             //Extra info in the subtitle field
-                            var usd = _localCurrency.GetRate(RateList.USD.ToString());
-                            var eur = _localCurrency.GetRate(RateList.EUR.ToString());
-                            var gbp = _localCurrency.GetRate(RateList.GBP.ToString());
-                            var jpy = _localCurrency.GetRate(RateList.JPY.ToString());
+                            var usd = _currency.GetRate(RateList.USD.ToString());
+                            var eur = _currency.GetRate(RateList.EUR.ToString());
+                            var gbp = _currency.GetRate(RateList.GBP.ToString());
+                            var jpy = _currency.GetRate(RateList.JPY.ToString());
 
+                            var rate = _currency.GetRate(localISOSymbol);
+                            result = money * rate;
                             results.Add(new Result
                             {
-                                Title = $"{money.ToString("C")} {toCurrency} = {result.ToString("C")} {localISOSymbol}",
+                                Title = $"{money.ToString(".00")} {toCurrency} = {result.ToString("C")} {localISOSymbol}",
                                 IcoPath = "Images/bank.png",
                                 SubTitle = $"More currencies: 100 {localISOSymbol} = {usd * 100} {RateList.USD} " +
                                            $"\n100 {localISOSymbol} = {eur * 100} {RateList.EUR} " +
@@ -68,7 +62,6 @@ namespace Wox.Plugin.Currency
                     && query.RawQuery.Split(' ').Length == 4) //100 usd in nok
                 {
                     var pattern = @"(\d+(\.\d{1,2})?)?\s([A-Za-z]{3})\s([i][n])\s([A-Za-z]{3})";
-
                     if (Regex.IsMatch(query.RawQuery, pattern))
                     {
                         //Inputs
@@ -76,21 +69,19 @@ namespace Wox.Plugin.Currency
                         toCurrency = query.RawQuery.Split(' ')[3].ToUpper();
                         var money = Convert.ToDecimal(query.FirstSearch);
                         
-                        if ((_currency == null
-                        || Convert.ToDateTime(_currency.date) < DateTime.Today)
-                        && Enum.IsDefined(typeof(RateList), fromCurrency)
-                        && Enum.IsDefined(typeof(RateList), query.RawQuery.Split(' ')[3].ToUpper()))
+                        if (Enum.IsDefined(typeof(RateList), fromCurrency)
+                            && Enum.IsDefined(typeof(RateList), query.RawQuery.Split(' ')[3].ToUpper()))
                         {
                             //Checks if the input currencies exists in enum
-                            _currency = GetCurrency(toCurrency);
+                            _currency = GetCurrency(fromCurrency);
                             var rate = _currency.GetRate(toCurrency);
                             result = money * rate;
+                            results.Add(new Result
+                            {
+                                Title = $"{money.ToString(".00")} {fromCurrency} = {result.ToString("C")} {toCurrency}",
+                                IcoPath = "Images/bank.png"
+                            });
                         }
-                        results.Add(new Result
-                        {
-                            Title = $"{money.ToString("C")} {fromCurrency} = {result.ToString("C")} {toCurrency}",
-                            IcoPath = "Images/bank.png"
-                        });
                     }
                 }
                 
@@ -111,27 +102,17 @@ namespace Wox.Plugin.Currency
         }
         public string GetTranslatedPluginTitle()
         {
-            return _context.API.GetTranslation("wox_plugin_folder_plugin_name");
+            return _context.API.GetTranslation("wox_plugin_currency");
         }
         public string GetTranslatedPluginDescription()
         {
-            return _context.API.GetTranslation("wox_plugin_folder_plugin_description");
+            return _context.API.GetTranslation("wox_plugin_currency_plugin_description");
         }
 
         #region helpers
-
-        private Models.Currency GetCurrency()
-        {
-            var url = $"http://api.fixer.io/latest?base={localISOSymbol}";
-            return GetCurrencyObject(url);
-        }
         private Models.Currency GetCurrency(string from)
         {
             var url = $"http://api.fixer.io/latest?base={from}";
-            return GetCurrencyObject(url);
-        }
-        private static Models.Currency GetCurrencyObject(string url)
-        {
             var request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = "GET";
             var response = (HttpWebResponse)request.GetResponse();
@@ -141,7 +122,6 @@ namespace Wox.Plugin.Currency
                 return JsonConvert.DeserializeObject<Models.Currency>(responsestring);
             }
         }
-        
         #endregion
     }
 }
