@@ -10,7 +10,7 @@ using Wox.Plugin.Currency.Models;
 
 namespace Wox.Plugin.Currency
 {
-    public class CurrencyPlugin : IPlugin, IPluginI18n
+    public class CurrencyPlugin : IPlugin
     {
         #region private fields
         private PluginInitContext _context;
@@ -96,19 +96,7 @@ namespace Wox.Plugin.Currency
         {
             _context = context;
         }
-        public string GetLanguagesFolder()
-        {
-            return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Languages");
-        }
-        public string GetTranslatedPluginTitle()
-        {
-            return _context.API.GetTranslation("wox_plugin_currency");
-        }
-        public string GetTranslatedPluginDescription()
-        {
-            return _context.API.GetTranslation("wox_plugin_currency_plugin_description");
-        }
-
+        
         #region helpers
         private Models.Currency GetCurrency(string from)
         {
