@@ -6,7 +6,7 @@ namespace Wox.Plugin.Currency.Models
     public class Currency
     {
         [JsonProperty]
-        public string _base { get; set; }
+        public string @base { get; set; }
         [JsonProperty]
         public string date { get; set; }
         [JsonProperty]

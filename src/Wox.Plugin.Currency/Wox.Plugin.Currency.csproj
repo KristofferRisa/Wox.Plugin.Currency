@@ -46,6 +46,7 @@
     <Compile Include="CurrencyPlugin.cs" />
     <Compile Include="Models\Currency.cs" />
     <Compile Include="Models\Rates.cs" />
+    <Compile Include="Models\SearchParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -61,10 +62,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "C:\Users\kristoffer.risa\Documents\GitHub\Wox.Plugin.Currency\src\Wox.Plugin.Currency\bin\Debug\*.dll" "C:\wox\Release\Plugins\Currency-c6ccfb32-852b-4fdd-b64a-bed33e9bde4a" /y
-xcopy "C:\Users\kristoffer.risa\Documents\GitHub\Wox.Plugin.Currency\src\Wox.Plugin.Currency\bin\Debug\*.json" "C:\wox\Release\Plugins\Currency-c6ccfb32-852b-4fdd-b64a-bed33e9bde4a" /y
-xcopy "C:\Users\kristoffer.risa\Documents\GitHub\Wox.Plugin.Currency\src\Wox.Plugin.Currency\bin\Debug\Images\*.*" "C:\wox\Release\Plugins\Currency-c6ccfb32-852b-4fdd-b64a-bed33e9bde4a\Images\*.*" /y
-xcopy "C:\Users\kristoffer.risa\Documents\GitHub\Wox.Plugin.Currency\src\Wox.Plugin.Currency\bin\Debug\Languages\*.*" "C:\wox\Release\Plugins\Currency-c6ccfb32-852b-4fdd-b64a-bed33e9bde4a\Languages\*.*" /y</PostBuildEvent>
+    <PostBuildEvent>xcopy "C:\Users\kristoffer.risa\Documents\GitHub\Wox.Plugin.Currency\src\Wox.Plugin.Currency\bin\Debug\*.dll" "C:\wox\Release\Plugins\Currency-b735d6e8-0b8e-4601-93e2-e3b457072f97" /y
+xcopy "C:\Users\kristoffer.risa\Documents\GitHub\Wox.Plugin.Currency\src\Wox.Plugin.Currency\bin\Debug\*.json" "C:\wox\Release\Plugins\Currency-b735d6e8-0b8e-4601-93e2-e3b457072f97" /y
+xcopy "C:\Users\kristoffer.risa\Documents\GitHub\Wox.Plugin.Currency\src\Wox.Plugin.Currency\bin\Debug\Images\*.*" "C:\wox\Release\Plugins\Currency-b735d6e8-0b8e-4601-93e2-e3b457072f97\Images\*.*" /y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
