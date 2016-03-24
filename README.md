@@ -3,12 +3,12 @@ A smart and easy currency converting for WOX using natural speech like google se
 
 ## Smart
 The plugin auto convert based on localization. 
-![Picture display plugin auto detects local currency](https://raw.githubusercontent.com/KristofferRisa/Wox.Plugin.Currency/master/images/currency-demo-short.png "short")
+![Displaying that the plugin detects the local currency and convert accordingly](https://raw.githubusercontent.com/KristofferRisa/Wox.Plugin.Currency/master/images/currency-demo-short.png "short")
 
 
 ## Easy
 Use natural speech.
-![Picture display convertering using long format](https://raw.githubusercontent.com/KristofferRisa/Wox.Plugin.Currency/master/images/currency-demo-long.png "long")
+![Displaying example of convertering plugin using long format](https://raw.githubusercontent.com/KristofferRisa/Wox.Plugin.Currency/master/images/currency-demo-long.png "long")
 
 ## Ussage
 * [Amount] [currency] = 10 usd
