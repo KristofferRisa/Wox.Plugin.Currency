@@ -15,7 +15,12 @@ namespace Wox.Plugin.Currency
         #region private fields
         private PluginInitContext _context;
         private string localISOSymbol => RegionInfo.CurrentRegion.ISOCurrencySymbol;
-        private readonly Dictionary<SearchParameters,Models.Currency> _cache;        
+        private readonly Dictionary<SearchParameters,Models.Currency> _cache;  
+        private readonly string oneWaycheckPattern = @"^(\d+(\.\d{1,2})?)?\s([A-Za-z]{3})$"; //10 usd
+        private readonly string twoWaycheckPattern = @"(\d+(\.\d{1,2})?)?\s([A-Za-z]{3})\s([i][n])\s([A-Za-z]{3})"; // 10 usd in nok
+        private string _toCurrency = "";
+        private string _fromCurrency = "";
+        private decimal _money = new decimal();
         #endregion
 
         public CurrencyPlugin()
@@ -31,57 +36,83 @@ namespace Wox.Plugin.Currency
             var results = new List<Result>();
             try
             {
-                var toCurrency = "";
-                var fromCurrency = "";
-                var money = new decimal();
-                var pattern = "";
-                if (query.RawQuery != null && query.RawQuery.Split(' ').Length == 2) // 123 usd
+                if (Regex.IsMatch(query.Search, oneWaycheckPattern))
                 {
-                    //inputs
-                    pattern = @"(\d+(\.\d{1,2})?)?\s([A-Za-z]{3})$";
-                    money = Convert.ToDecimal(query.FirstSearch);
-                    toCurrency = localISOSymbol;
-                    fromCurrency = query.SecondSearch.ToUpper(); 
-                    //check ISO symbols
-                    if (!Enum.IsDefined(typeof(RateList), query.SecondSearch.ToUpper())) return new List<Result>();
+                    if (query.RawQuery != null && query.RawQuery.Split(' ').Length == 2) // 123 usd
+                    {
+                        _money = Convert.ToDecimal(query.FirstSearch);
+                        _toCurrency = localISOSymbol;
+                        _fromCurrency = query.SecondSearch.ToUpper();
+                        //check ISO symbols
+                        if (!Enum.IsDefined(typeof (RateList), query.SecondSearch.ToUpper())) return new List<Result>();
+                        results = LoadCurrency(results);
+                    }
+                    
                 }
-                else if (query.RawQuery != null && query.RawQuery.Split(' ').Length == 4) //123 usd in nok
+                else if (Regex.IsMatch(query.Search, twoWaycheckPattern))
                 {
-                    //inputs
-                    toCurrency = query.RawQuery.Split(' ')[3].ToUpper();
-                    pattern = @"(\d+(\.\d{1,2})?)?\s([A-Za-z]{3})\s([i][n])\s([A-Za-z]{3})";
-                    fromCurrency = query.SecondSearch.ToUpper();
-                    money = Convert.ToDecimal(query.FirstSearch);
-                    //check ISO symbols
-                    if (!Enum.IsDefined(typeof(RateList), fromCurrency)
-                            && !Enum.IsDefined(typeof(RateList), query.RawQuery.Split(' ')[3].ToUpper())) return results;
+                    if (query.RawQuery != null && query.RawQuery.Split(' ').Length == 4) //123 usd in nok
+                    {
+                        _toCurrency = query.RawQuery.Split(' ')[3].ToUpper();
+                        _fromCurrency = query.SecondSearch.ToUpper();
+                        _money = Convert.ToDecimal(query.FirstSearch);
+                        //check ISO symbols
+                        if (!Enum.IsDefined(typeof(RateList), _fromCurrency)
+                            && !Enum.IsDefined(typeof(RateList), query.RawQuery.Split(' ')[3].ToUpper()))
+                            return results;
+                    results = LoadCurrency(results);
+                    }
                 }
-                else
+                else if (query.Search == "currency")
                 {
-                    return new List<Result>();   
-                }
-                if (Regex.IsMatch(query.RawQuery, pattern))
-                {
-                    var currency = GetCurrency(new SearchParameters() {BaseIso = fromCurrency, ToIso = toCurrency});
-                    var rate = currency.GetRate(toCurrency);
+                    var ratelist = Enum.GetValues(typeof(RateList));
+                    var rates = "";
+                    foreach (var rate in ratelist)
+                    {
+                        if (rates.Length > 1)
+                        {
+                            rates += $"Avaliable rates are {rate} ";
+                        }
+                        else
+                        {
+                            rates += $"{rate} ,";
+                        }
+                    }
                     results.Add(new Result
                     {
-                        Title = $"{money.ToString(".00")} {fromCurrency} = {(money * rate).ToString("C")} {toCurrency}",
+                        Title = rates,
                         IcoPath = "Images/bank.png",
-                        SubTitle = $"Source: fixer.io (Last updated {currency.date})"
+                        SubTitle = $"Source: fixer.io"
                     });
                 }
+
                 return results;
             }
             catch (Exception)
             {
                 return new List<Result>();
             }
+
         }
+
+        private List<Result> LoadCurrency(List<Result> results)
+        {
+            var currency = GetCurrency(new SearchParameters() {BaseIso = _fromCurrency, ToIso = _toCurrency});
+            var rate = currency.GetRate(_toCurrency);
+            results.Add(new Result
+            {
+                Title = $"{_money.ToString(".00")} {_fromCurrency} = {(_money*rate).ToString("C")} {_toCurrency}",
+                IcoPath = "Images/bank.png",
+                SubTitle = $"Source: fixer.io (Last updated {currency.date})"
+            });
+            return results;
+        }
+
         public void Init(PluginInitContext context)
         {
             _context = context;
         }
+
         #region helpers
         private Models.Currency GetCurrency(SearchParameters searchParameters)
         {
@@ -112,6 +143,11 @@ namespace Wox.Plugin.Currency
                 _cache.Add(searchParameters,currency);
                 return currency;
             }
+        }
+
+        private bool CheckRegExOnQuery(string query)
+        {
+            return false;
         }
         #endregion
     }

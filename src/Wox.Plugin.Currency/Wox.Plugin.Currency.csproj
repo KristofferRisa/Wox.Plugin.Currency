@@ -17,10 +17,11 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\Wox\Output\Debug\Plugins\Wox.Plugin.Currency\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -62,9 +64,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "C:\Users\kristoffer.risa\Documents\GitHub\Wox.Plugin.Currency\src\Wox.Plugin.Currency\bin\Debug\*.dll" "C:\wox\Release\Plugins\Currency-b735d6e8-0b8e-4601-93e2-e3b457072f97" /y
-xcopy "C:\Users\kristoffer.risa\Documents\GitHub\Wox.Plugin.Currency\src\Wox.Plugin.Currency\bin\Debug\*.json" "C:\wox\Release\Plugins\Currency-b735d6e8-0b8e-4601-93e2-e3b457072f97" /y
-xcopy "C:\Users\kristoffer.risa\Documents\GitHub\Wox.Plugin.Currency\src\Wox.Plugin.Currency\bin\Debug\Images\*.*" "C:\wox\Release\Plugins\Currency-b735d6e8-0b8e-4601-93e2-e3b457072f97\Images\*.*" /y</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,12 +1,12 @@
 ﻿{
-  "ID":"72e280cde081433bb10e986a4d96caa3",   //Plugin ID，32 bit UUID
-  "ActionKeyword":"*",                     //Plugin default action keyword
-  "Name":"Currency",                              //Plugin name
-  "Description":"Converts currency to local currency",    //Plugin description
-  "Author":"KristofferRisa",                     //Plugin Author
-  "Version":"1.0.0",                         //Plugin version，must be x.x.x format
-  "Language":"csharp",                       //Plugin language，we support csharp,python and executable now
-  "Website":"http://www.getwox.com",         //Plugin website or author website
-  "IcoPath": "Images\\bank.png",              //Plugin icon, relative path to the pluign folder
-  "ExecuteFileName":"Wox.Plugin.Currency.dll"   //Execution entry. Dll name for c# plugin, and python file for python plugin
+  "ID":"72E280CDE081433BB10E986A4d96CAA3",
+  "ActionKeyword":"*",
+  "Name":"Wox.Plugin.Currency",
+  "Description":"Converts currency to local currency",
+  "Author":"r1sa",
+  "Version":"1.0.1",
+  "Language":"csharp",
+  "Website":"https://github.com/KristofferRisa/Wox.Plugin.Currency",
+  "IcoPath": "Images\\bank.png",
+  "ExecuteFileName":"Wox.Plugin.Currency.dll"
 }
