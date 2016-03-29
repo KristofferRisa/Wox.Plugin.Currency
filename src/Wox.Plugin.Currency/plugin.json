@@ -2,7 +2,7 @@
   "ID":"72E280CDE081433BB10E986A4d96CAA3",
   "ActionKeyword":"*",
   "Name":"Wox.Plugin.Currency",
-  "Description":"Converts currency to local currency",
+  "Description":"A smart and easy currency converter for WOX",
   "Author":"r1sa",
   "Version":"1.0.1",
   "Language":"csharp",
