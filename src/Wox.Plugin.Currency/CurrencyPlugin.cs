@@ -101,7 +101,7 @@ namespace Wox.Plugin.Currency
             var rate = currency.GetRate(_toCurrency);
             results.Add(new Result
             {
-                Title = $"{_money.ToString(".00")} {_fromCurrency} = {(_money*rate).ToString("C")} {_toCurrency}",
+                Title = $"{_money.ToString()} {_fromCurrency} = {(_money*rate).ToString()} {_toCurrency}",
                 IcoPath = "Images/bank.png",
                 SubTitle = $"Source: fixer.io (Last updated {currency.date})"
             });
