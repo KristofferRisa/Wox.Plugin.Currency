@@ -1,23 +1,16 @@
-# Wox Currency plugin
-A smart and easy currency converting for WOX using natural speech like google search. 
+# Wox Currency plugin 2.0
+New and improved version of [smart and easy currency converter](https://github.com/KristofferRisa/Wox.Plugin.Currency) for WOX.
 
-## Smart
-The plugin auto convert based on localization. 
-![Displaying that the plugin detects the local currency and convert accordingly](https://raw.githubusercontent.com/KristofferRisa/Wox.Plugin.Currency/master/images/currency-demo-short.png "short")
+## What's better in comparison with the original converter.
+* Supporting all available currencies from [fixer.io](https://fixer.io/)
+* Improved UI and UX.
+* Retired useless functionality
+* Fixed minor issues and cleaned up a codebase.
+* Plugin became faster and more stable 
 
+## Usage
+* [Amount] [currency] in [currency] = 10 usd in eur
 
-## Easy
-Use natural speech.
-![Displaying example of convertering plugin using long format](https://raw.githubusercontent.com/KristofferRisa/Wox.Plugin.Currency/master/images/currency-demo-long.png "long")
-
-## Ussage
-* [Amount] [currency] = 10 usd
-
-* [Amount] [currency] in [currency] = 10 usd in nok
-
-## WOX
-For more info se [wox's github repo](https://github.com/Wox-launcher/Wox) or go visit the [homepage](http://www.getwox.com/). 
 
 ## Currency API
-
-Uses [fixer.io API](http://fixer.io), see [github repo](https://github.com/hakanensari/fixer-io)
+Plugin uses [fixer.io API](http://fixer.io), see [github repo](https://github.com/hakanensari/fixer-io)
