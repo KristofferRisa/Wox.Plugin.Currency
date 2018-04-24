@@ -5,7 +5,7 @@ namespace Wox.Plugin.Currency
 {
     public class CurrencyPlugin : IPlugin
     {
-        private const string Pattern = @"(?<amount>\d+(?:\.\d+)?)\s(?<from>[A-Za-z]+)\s(?:to|in)\s(?<to>[A-Za-z]+)";
+        private const string Pattern = @"^(?<amount>\d+(?:\.\d+)?)\s(?<from>[A-Za-z]{3})\s(?:to|in)\s(?<to>[A-Za-z]{3})$";
         
         public void Init(PluginInitContext context)
         {
