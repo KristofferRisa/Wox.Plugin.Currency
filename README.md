@@ -1,4 +1,4 @@
-# Wox Currency plugin 2.0
+# Wox Currency converter 2.0
 New and improved version of [smart and easy currency converter](https://github.com/KristofferRisa/Wox.Plugin.Currency) for WOX.
 
 ## What's better in comparison with the original converter.
