@@ -82,7 +82,7 @@ namespace Wox.Plugin.Currency
                     {
                         Title = rates,
                         IcoPath = "Images/bank.png",
-                        SubTitle = $"Source: fixer.io"
+                        SubTitle = $"Source: exchangeratesapi.io"
                     });
                 }
 
@@ -103,7 +103,7 @@ namespace Wox.Plugin.Currency
             {
                 Title = $"{_money.ToString(".00")} {_fromCurrency} = {(_money*rate).ToString("C")} {_toCurrency}",
                 IcoPath = "Images/bank.png",
-                SubTitle = $"Source: fixer.io (Last updated {currency.date})"
+                SubTitle = $"Source: exchangeratesapi.io (Last updated {currency.date})"
             });
             return results;
         }
@@ -116,7 +116,7 @@ namespace Wox.Plugin.Currency
         #region helpers
         private Models.Currency GetCurrency(SearchParameters searchParameters)
         {
-            var url = $"http://api.fixer.io/latest?base={searchParameters.BaseIso}&symbols={searchParameters.ToIso}";
+            var url = $"http://api.exchangeratesapi.io/latest?base={searchParameters.BaseIso}&symbols={searchParameters.ToIso}";
 
             if (_cache.ContainsKey(searchParameters))
             {
