@@ -1,21 +1,27 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Wox.Plugin.Currency.Models
 {
     public class Currency
     {
-        [JsonProperty]
-        public string @base { get; set; }
-        [JsonProperty]
-        public string date { get; set; }
-        [JsonProperty]
-        public Rates rates { get; set; }
-
-        public decimal GetRate(string currency)
-        {
-            return Convert.ToDecimal(this.rates.GetType().GetProperty(currency).GetValue(rates, null));
-        }
+        [JsonProperty("amount")]
+        public float Amount { get; set; }
+        [JsonProperty("_base")]
+        public string Base { get; set; }
+        [JsonProperty("date")]
+        public string Date { get; set; }
+        [JsonProperty("rates")]
+        public string Rate { get; set; }
     }
-    
+
+    public class Rates
+    {
+        public float NOK { get; set; }
+    }
+
 }
