@@ -13,12 +13,19 @@ namespace Wox.Plugin.Currency
     public class CurrencyPlugin : IPlugin
     {
         private PluginInitContext _context;
+
         private string LocalISOSymbol => RegionInfo.CurrentRegion.ISOCurrencySymbol;
-        private readonly Dictionary<SearchParameters,Models.Currency> _cache;  
+
+        private readonly Dictionary<SearchParameters, Models.Currency> _cache;
+
         private readonly string oneWaycheckPattern = @"^(\d+(\.\d{1,2})?)?\s([A-Za-z]{3})$"; //10 usd
+
         private readonly string twoWaycheckPattern = @"(\d+(\.\d{1,2})?)?\s([A-Za-z]{3})\s([i][n])\s([A-Za-z]{3})"; // 10 usd in nok
+
         private string _toCurrency = "";
+
         private string _fromCurrency = "";
+
         private decimal _money = new decimal();
 
         public CurrencyPlugin()
@@ -27,6 +34,11 @@ namespace Wox.Plugin.Currency
             {
                 _cache = new Dictionary<SearchParameters, Models.Currency>();
             }
+        }
+
+        public void Init(PluginInitContext context)
+        {
+            _context = context;
         }
 
         public List<Result> Query(Query query)
@@ -107,12 +119,7 @@ namespace Wox.Plugin.Currency
             });
             return results;
         }
-
-        public void Init(PluginInitContext context)
-        {
-            _context = context;
-        }
-
+             
         private Models.Currency GetCurrency(SearchParameters searchParameters)
         {
             var url = $"https://frankfurter.app/latest?base={searchParameters.BaseIso}&symbols={searchParameters.ToIso}";
@@ -144,9 +151,5 @@ namespace Wox.Plugin.Currency
             }
         }
 
-        private bool CheckRegExOnQuery(string query)
-        {
-            return false;
-        }
     }
 }
