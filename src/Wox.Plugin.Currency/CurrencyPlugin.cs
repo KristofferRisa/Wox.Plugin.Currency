@@ -4,9 +4,13 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Windows;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Wox.Plugin.Currency.Models;
+using System.Windows.Forms;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace Wox.Plugin.Currency
 {
@@ -43,9 +47,9 @@ namespace Wox.Plugin.Currency
 
         public List<Result> Query(Query query)
         {
-            var results = new List<Result>();
             try
             {
+                var results = new List<Result>();
                 if (Regex.IsMatch(query.Search, oneWaycheckPattern))
                 {
                     if (query.RawQuery != null && query.RawQuery.Split(' ').Length == 2) // 123 usd
@@ -54,10 +58,10 @@ namespace Wox.Plugin.Currency
                         _toCurrency = LocalISOSymbol;
                         _fromCurrency = query.SecondSearch.ToUpper();
                         //check ISO symbols
-                        if (!Enum.IsDefined(typeof (RateList), query.SecondSearch.ToUpper())) return new List<Result>();
+                        if (!Enum.IsDefined(typeof (RateList), query.SecondSearch.ToUpper())) 
+                            return new List<Result>();
                         results = LoadCurrency(results);
                     }
-                    
                 }
                 else if (Regex.IsMatch(query.Search, twoWaycheckPattern))
                 {
@@ -100,8 +104,6 @@ namespace Wox.Plugin.Currency
             }
             catch (Exception e)
             {
-                //Add logging
-                Console.WriteLine(e.Message);
                 return new List<Result>();
             }
 
@@ -109,13 +111,32 @@ namespace Wox.Plugin.Currency
 
         private List<Result> LoadCurrency(List<Result> results)
         {
-            var currency = GetCurrency(new SearchParameters() {BaseIso = _fromCurrency, ToIso = _toCurrency});
+            var searchParameters = new SearchParameters()
+            {
+                BaseIso = _fromCurrency,
+                ToIso = _toCurrency
+            };
+            var currency = GetCurrency(searchParameters);
             var rate = currency.GetRate(_toCurrency);
+            var converted = _money * rate;
             results.Add(new Result
             {
-                Title = $"{_money.ToString(".00")} {_fromCurrency} = {(_money*rate).ToString("C")} {_toCurrency}",
+                Title = $"{_money} {_fromCurrency} = {converted} {_toCurrency}",
                 IcoPath = "Images/bank.png",
-                SubTitle = $"Source: https://frankfurter.app (Last updated {currency.date})"
+                SubTitle = $"Source: https://frankfurter.app (Updated {currency.date})",
+                Action = c =>
+                {
+                    try
+                    {
+                        Clipboard.SetText(converted.ToString());
+                        return true;
+                    }
+                    catch (ExternalException)
+                    {
+                        MessageBox.Show("Copy failed, please try later");
+                        return false;
+                    }
+                }
             });
             return results;
         }
