@@ -12,16 +12,14 @@ namespace Wox.Plugin.Currency
 {
     public class CurrencyPlugin : IPlugin
     {
-        #region private fields
         private PluginInitContext _context;
-        private string localISOSymbol => RegionInfo.CurrentRegion.ISOCurrencySymbol;
+        private string LocalISOSymbol => RegionInfo.CurrentRegion.ISOCurrencySymbol;
         private readonly Dictionary<SearchParameters,Models.Currency> _cache;  
         private readonly string oneWaycheckPattern = @"^(\d+(\.\d{1,2})?)?\s([A-Za-z]{3})$"; //10 usd
         private readonly string twoWaycheckPattern = @"(\d+(\.\d{1,2})?)?\s([A-Za-z]{3})\s([i][n])\s([A-Za-z]{3})"; // 10 usd in nok
         private string _toCurrency = "";
         private string _fromCurrency = "";
         private decimal _money = new decimal();
-        #endregion
 
         public CurrencyPlugin()
         {
@@ -40,8 +38,8 @@ namespace Wox.Plugin.Currency
                 {
                     if (query.RawQuery != null && query.RawQuery.Split(' ').Length == 2) // 123 usd
                     {
-                        _money = Convert.ToDecimal(query.FirstSearch);
-                        _toCurrency = localISOSymbol;
+                         _money = Convert.ToDecimal(query.FirstSearch);
+                        _toCurrency = LocalISOSymbol;
                         _fromCurrency = query.SecondSearch.ToUpper();
                         //check ISO symbols
                         if (!Enum.IsDefined(typeof (RateList), query.SecondSearch.ToUpper())) return new List<Result>();
@@ -88,8 +86,10 @@ namespace Wox.Plugin.Currency
 
                 return results;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                //Add logging
+                Console.WriteLine(e.Message);
                 return new List<Result>();
             }
 
@@ -113,7 +113,6 @@ namespace Wox.Plugin.Currency
             _context = context;
         }
 
-        #region helpers
         private Models.Currency GetCurrency(SearchParameters searchParameters)
         {
             var url = $"https://frankfurter.app/latest?base={searchParameters.BaseIso}&symbols={searchParameters.ToIso}";
@@ -149,6 +148,5 @@ namespace Wox.Plugin.Currency
         {
             return false;
         }
-        #endregion
     }
 }
