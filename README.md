@@ -13,7 +13,7 @@ Use natural speech.
 ## Ussage
 * [Amount] [currency] = 10 usd
 
-* [Amount] [currency] in [currency] = 10 usd in nok
+* [Amount] [currency] in [currency] = 10 [currency] in [local_currency]
 
 ## WOX
 For more info se [wox's github repo](https://github.com/Wox-launcher/Wox) or go visit the [homepage](http://www.getwox.com/). 
@@ -21,3 +21,11 @@ For more info se [wox's github repo](https://github.com/Wox-launcher/Wox) or go 
 ## Currency API
 
 Uses [fixer.io API](http://fixer.io), see [github repo](https://github.com/hakanensari/fixer-io)
+
+
+## Contribute
+### How to debug
+1. checkout from master branch
+2. put you plugin source code folder under Wox\Plugins
+3. run vs
+4. run debugger
