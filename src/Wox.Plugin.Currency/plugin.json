@@ -4,7 +4,7 @@
   "Name":"Wox.Plugin.Currency",
   "Description":"A smart and easy currency converter for WOX",
   "Author":"Kristoffer",
-  "Version":"1.0.2",
+  "Version":"2.0.2",
   "Language":"csharp",
   "Website":"https://github.com/KristofferRisa/Wox.Plugin.Currency",
   "IcoPath": "Images\\bank.png",
