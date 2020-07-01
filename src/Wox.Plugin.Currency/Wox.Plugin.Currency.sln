@@ -1,17 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2035
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wox.Plugin.Currency", "Wox.Plugin.Currency.csproj", "{00992EFD-CC19-4576-B023-BCE4862AD33D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wox.Core", "..\..\..\Wox\Wox.Core\Wox.Core.csproj", "{B749F0DB-8E75-47DB-9E5E-265D16D0C0D2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wox.Plugin", "..\..\..\Wox\Wox.Plugin\Wox.Plugin.csproj", "{8451ECDD-2EA4-4966-BB0A-7BBC40138E80}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wox.Plugin.Currency.Test", "..\..\test\Wox.Plugin.Currency.Test\Wox.Plugin.Currency.Test.csproj", "{ABAA395B-F66F-43E5-92E7-7AF297415E10}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wox.Infrastructure", "..\..\..\Wox\Wox.Infrastructure\Wox.Infrastructure.csproj", "{4FD29318-A8AB-4D8F-AA47-60BC241B8DA3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,22 +17,10 @@ Global
 		{00992EFD-CC19-4576-B023-BCE4862AD33D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00992EFD-CC19-4576-B023-BCE4862AD33D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00992EFD-CC19-4576-B023-BCE4862AD33D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B749F0DB-8E75-47DB-9E5E-265D16D0C0D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B749F0DB-8E75-47DB-9E5E-265D16D0C0D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B749F0DB-8E75-47DB-9E5E-265D16D0C0D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B749F0DB-8E75-47DB-9E5E-265D16D0C0D2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8451ECDD-2EA4-4966-BB0A-7BBC40138E80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8451ECDD-2EA4-4966-BB0A-7BBC40138E80}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8451ECDD-2EA4-4966-BB0A-7BBC40138E80}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8451ECDD-2EA4-4966-BB0A-7BBC40138E80}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ABAA395B-F66F-43E5-92E7-7AF297415E10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ABAA395B-F66F-43E5-92E7-7AF297415E10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ABAA395B-F66F-43E5-92E7-7AF297415E10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABAA395B-F66F-43E5-92E7-7AF297415E10}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4FD29318-A8AB-4D8F-AA47-60BC241B8DA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4FD29318-A8AB-4D8F-AA47-60BC241B8DA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4FD29318-A8AB-4D8F-AA47-60BC241B8DA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4FD29318-A8AB-4D8F-AA47-60BC241B8DA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

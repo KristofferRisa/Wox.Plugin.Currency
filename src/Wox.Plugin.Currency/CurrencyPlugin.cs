@@ -4,24 +4,29 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Windows;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Wox.Plugin.Currency.Models;
+using System.Windows.Forms;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace Wox.Plugin.Currency
 {
     public class CurrencyPlugin : IPlugin
     {
-        #region private fields
         private PluginInitContext _context;
-        private string localISOSymbol => RegionInfo.CurrentRegion.ISOCurrencySymbol;
-        private readonly Dictionary<SearchParameters,Models.Currency> _cache;  
-        private readonly string oneWaycheckPattern = @"^(\d+(\.\d{1,2})?)?\s([A-Za-z]{3})$"; //10 usd
-        private readonly string twoWaycheckPattern = @"(\d+(\.\d{1,2})?)?\s([A-Za-z]{3})\s([i][n])\s([A-Za-z]{3})"; // 10 usd in nok
+
+        private string LocalISOSymbol => RegionInfo.CurrentRegion.ISOCurrencySymbol;
+
+        private readonly Dictionary<SearchParameters, Models.Currency> _cache;
+        
         private string _toCurrency = "";
+
         private string _fromCurrency = "";
+
         private decimal _money = new decimal();
-        #endregion
 
         public CurrencyPlugin()
         {
@@ -31,90 +36,69 @@ namespace Wox.Plugin.Currency
             }
         }
 
-        public List<Result> Query(Query query)
-        {
-            var results = new List<Result>();
-            try
-            {
-                if (Regex.IsMatch(query.Search, oneWaycheckPattern))
-                {
-                    if (query.RawQuery != null && query.RawQuery.Split(' ').Length == 2) // 123 usd
-                    {
-                        _money = Convert.ToDecimal(query.FirstSearch);
-                        _toCurrency = localISOSymbol;
-                        _fromCurrency = query.SecondSearch.ToUpper();
-                        //check ISO symbols
-                        if (!Enum.IsDefined(typeof (RateList), query.SecondSearch.ToUpper())) return new List<Result>();
-                        results = LoadCurrency(results);
-                    }
-                    
-                }
-                else if (Regex.IsMatch(query.Search, twoWaycheckPattern))
-                {
-                    if (query.RawQuery != null && query.RawQuery.Split(' ').Length == 4) //123 usd in nok
-                    {
-                        _toCurrency = query.RawQuery.Split(' ')[3].ToUpper();
-                        _fromCurrency = query.SecondSearch.ToUpper();
-                        _money = Convert.ToDecimal(query.FirstSearch);
-                        //check ISO symbols
-                        if (!Enum.IsDefined(typeof(RateList), _fromCurrency)
-                            && !Enum.IsDefined(typeof(RateList), query.RawQuery.Split(' ')[3].ToUpper()))
-                            return results;
-                    results = LoadCurrency(results);
-                    }
-                }
-                else if (query.Search == "currency")
-                {
-                    var ratelist = Enum.GetValues(typeof(RateList));
-                    var rates = "";
-                    foreach (var rate in ratelist)
-                    {
-                        if (rates.Length > 1)
-                        {
-                            rates += $"Avaliable rates are {rate} ";
-                        }
-                        else
-                        {
-                            rates += $"{rate} ,";
-                        }
-                    }
-                    results.Add(new Result
-                    {
-                        Title = rates,
-                        IcoPath = "Images/bank.png",
-                        SubTitle = $"Source: fixer.io"
-                    });
-                }
-
-                return results;
-            }
-            catch (Exception)
-            {
-                return new List<Result>();
-            }
-
-        }
-
-        private List<Result> LoadCurrency(List<Result> results)
-        {
-            var currency = GetCurrency(new SearchParameters() {BaseIso = _fromCurrency, ToIso = _toCurrency});
-            var rate = currency.GetRate(_toCurrency);
-            results.Add(new Result
-            {
-                Title = $"{_money.ToString(".00")} {_fromCurrency} = {(_money*rate).ToString("C")} {_toCurrency}",
-                IcoPath = "Images/bank.png",
-                SubTitle = $"Source: https://frankfurter.app (Last updated {currency.date})"
-            });
-            return results;
-        }
-
         public void Init(PluginInitContext context)
         {
             _context = context;
         }
 
-        #region helpers
-        private Models.Currency GetCurrency(SearchParameters searchParameters)
+        public List<Result> Query(Query query)
+        {
+            try
+            {
+                query
+                    .IsCurrencyConversion()
+                    .IsNotNull();
+
+                _money = Convert.ToDecimal(query.FirstSearch);
+                _fromCurrency = query.SecondSearch.ToUpper();
+                _toCurrency = query.RawQuery.Split(' ')[3].ToUpper() ?? LocalISOSymbol;
+
+                if (!Enum.IsDefined(
+                        typeof(RateList), 
+                        query.RawQuery.Split(' ')[3].ToUpper() 
+                            ?? query.SecondSearch.ToUpper()))
+                    return new List<Result>();
+
+                var searchParameters = new SearchParameters()
+                {
+                    BaseIso = _fromCurrency,
+                    ToIso = _toCurrency
+                };
+                var currency = GetCurrencyFromApi(searchParameters);
+                var rate = currency.GetRate(_toCurrency);
+                var convertedValue = ((double)(_money * rate)).ToString();
+                return new List<Result>()
+                {   
+                    new Result
+                    {
+                        Title = $"{_money} {_fromCurrency} = {convertedValue} {_toCurrency}",
+                        IcoPath = "Images/bank.png",
+                        SubTitle = $"Enter to copy. Source: https://frankfurter.app (Updated {currency.date})",
+                        Action = c =>
+                        {
+                            try
+                            {
+                                Clipboard.SetText(convertedValue);
+                                return true;
+                            }
+                            catch (ExternalException)
+                            {
+                                MessageBox.Show("Copy failed, please try later");
+                                return false;
+                            }
+                        }
+                    }
+                };
+
+            }
+            catch 
+            {
+                return new List<Result>();
+            }
+
+        }
+             
+        private Models.Currency GetCurrencyFromApi(SearchParameters searchParameters)
         {
             var url = $"https://frankfurter.app/latest?base={searchParameters.BaseIso}&symbols={searchParameters.ToIso}";
 
@@ -145,10 +129,5 @@ namespace Wox.Plugin.Currency
             }
         }
 
-        private bool CheckRegExOnQuery(string query)
-        {
-            return false;
-        }
-        #endregion
     }
 }

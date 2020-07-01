@@ -55,10 +55,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Wox\Wox.Core\Wox.Core.csproj">
-      <Project>{B749F0DB-8E75-47DB-9E5E-265D16D0C0D2}</Project>
-      <Name>Wox.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\Wox.Plugin.Currency\Wox.Plugin.Currency.csproj">
       <Project>{00992EFD-CC19-4576-B023-BCE4862AD33D}</Project>
       <Name>Wox.Plugin.Currency</Name>
