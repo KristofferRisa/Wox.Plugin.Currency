@@ -4,13 +4,12 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Windows;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Wox.Plugin.Currency.Models;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
+using Wox.Infrastructure.Logger;
+using NLog;
 
 namespace Wox.Plugin.Currency
 {
@@ -18,6 +17,7 @@ namespace Wox.Plugin.Currency
     {
         private PluginInitContext _context;
 
+        private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
         private string LocalISOSymbol => RegionInfo.CurrentRegion.ISOCurrencySymbol;
 
         private readonly Dictionary<SearchParameters, Models.Currency> _cache;
@@ -30,6 +30,7 @@ namespace Wox.Plugin.Currency
 
         public CurrencyPlugin()
         {
+            Logger.WoxInfo("Currency plugin loaded.");
             if (_cache == null)
             {
                 _cache = new Dictionary<SearchParameters, Models.Currency>();
@@ -52,6 +53,7 @@ namespace Wox.Plugin.Currency
                 _money = Convert.ToDecimal(query.FirstSearch);
                 _fromCurrency = query.SecondSearch.ToUpper();
                 _toCurrency = query.RawQuery.Split(' ')[3].ToUpper() ?? LocalISOSymbol;
+                Logger.WoxInfo($"Converting {_money} from {_fromCurrency} to {_toCurrency}");
 
                 if (!Enum.IsDefined(
                         typeof(RateList), 
@@ -67,6 +69,7 @@ namespace Wox.Plugin.Currency
                 var currency = GetCurrencyFromApi(searchParameters);
                 var rate = currency.GetRate(_toCurrency);
                 var convertedValue = ((double)(_money * rate)).ToString();
+                Logger.WoxInfo($"Converted {_money} {_fromCurrency} to {convertedValue} {_toCurrency} with rate {rate}");
                 return new List<Result>()
                 {   
                     new Result
@@ -81,31 +84,32 @@ namespace Wox.Plugin.Currency
                                 Clipboard.SetText(convertedValue);
                                 return true;
                             }
-                            catch (ExternalException)
+                            catch (ExternalException e)
                             {
+                                Logger.WoxInfo($"Copy failed, please try later: {e.Message}");
                                 MessageBox.Show("Copy failed, please try later");
                                 return false;
                             }
                         }
                     }
                 };
-
             }
-            catch 
+            catch
             {
                 return new List<Result>();
             }
-
         }
              
         private Models.Currency GetCurrencyFromApi(SearchParameters searchParameters)
         {
+            Logger.WoxInfo("Loading rates...");
             var url = $"https://frankfurter.app/latest?base={searchParameters.BaseIso}&symbols={searchParameters.ToIso}";
 
             if (_cache.ContainsKey(searchParameters))
             {
                 if (Convert.ToDateTime(_cache[searchParameters].date) == DateTime.Today)
                 {
+                    Logger.WoxInfo("Loading rates from cache");
                     return _cache[searchParameters];
                 }
             }
@@ -120,6 +124,7 @@ namespace Wox.Plugin.Currency
             var response = (HttpWebResponse)request.GetResponse();
             using (new StreamReader(response.GetResponseStream()))
             {
+                Logger.WoxInfo("Reading rates from API");
                 var responsestring = new StreamReader(response.GetResponseStream()).ReadToEnd();
 
                 var currency =  JsonConvert.DeserializeObject<Models.Currency>(responsestring);
