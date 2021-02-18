@@ -18,7 +18,7 @@ namespace Wox.Plugin.Currency
         private PluginInitContext _context;
 
         private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
-        private string LocalISOSymbol => RegionInfo.CurrentRegion.ISOCurrencySymbol;
+        private string LocalISOSymbol => RegionInfo.CurrentRegion.CurrencyEnglishName;
 
         private readonly Dictionary<SearchParameters, Models.Currency> _cache;
         
@@ -76,7 +76,7 @@ namespace Wox.Plugin.Currency
                     {
                         Title = $"{_money} {_fromCurrency} = {convertedValue} {_toCurrency}",
                         IcoPath = "Images/bank.png",
-                        SubTitle = $"Enter to copy. Source: https://frankfurter.app (Updated {currency.date})",
+                        SubTitle = $" https://frankfurter.app (Last updated {currency.date})",
                         Action = c =>
                         {
                             try
