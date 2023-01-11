@@ -69,5 +69,6 @@
         TRY,
         USD,
         ZAR,
+        BTC
     }
 }

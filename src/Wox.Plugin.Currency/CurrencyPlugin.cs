@@ -12,6 +12,7 @@ using Wox.Plugin.Currency.ViewModels;
 using System.Windows.Controls;
 using Wox.Plugin.Currency.Views;
 using Wox.Infrastructure.Storage;
+using Newtonsoft.Json.Linq;
 
 namespace Wox.Plugin.Currency
 {
@@ -67,7 +68,7 @@ namespace Wox.Plugin.Currency
 
                     if (IsTwoWayConversion(query.RawQuery))
                     {
-                        _toCurrency = query.RawQuery.Split(' ')[3].ToUpper();
+                        _toCurrency = query.RawQuery.Split(' ')[3].ToUpper();                        
                     }
 
                     if (!Enum.IsDefined(
@@ -88,6 +89,12 @@ namespace Wox.Plugin.Currency
                             && i.To == item.To
                             && i.Created.Date == item.Created.Date))
                     {
+                        item.BtcRate = cache
+                            .Where(i => i.From == item.From
+                                && i.To == item.To
+                                && i.Created.Date == item.Created.Date)
+                            .Select(x => x.BtcRate)
+                            .FirstOrDefault();
                         item.Rate = cache
                             .Where(i => i.From == item.From
                                 && i.To == item.To
@@ -99,26 +106,64 @@ namespace Wox.Plugin.Currency
                     {                        
                         try
                         {
-                            if(settings.ActiveApiProvider == "frankfurter.app") 
+                            ServicePointManager.Expect100Continue = true;
+                            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+                            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+                            if (item.From == "BTC" || item.To == "BTC")
                             {
-                                ServicePointManager.Expect100Continue = true;
-                                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-
-                                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-
-                                var url = $"https://api.frankfurter.app/latest?from={item.From}&to={item.To}";
-                                var request = (HttpWebRequest)WebRequest.Create(url);
-                                request.Method = "GET";
-                                var response = (HttpWebResponse)request.GetResponse();
-                                using (new StreamReader(response.GetResponseStream()))
+                                using (WebClient client = new WebClient())
                                 {
-                                    var responsestring = new StreamReader(response.GetResponseStream()).ReadToEnd();
-                                    var currency = JsonConvert.DeserializeObject<Models.Currency>(responsestring);
-                                    item.Rate = currency.GetRate(item.To);
-                                    item.Created = DateTime.Parse(currency.date);
+                                    string response = client.DownloadString("https://api.coindesk.com/v1/bpi/currentprice/USD.json");
+
+                                    // Parse the response as JSON
+                                    JObject json = JObject.Parse(response);
+                                    item.BtcRate = (decimal)json["bpi"]["USD"]["rate_float"];
+                                }
+                            }
+                            
+                            if (settings.ActiveApiProvider == "frankfurter.app")
+                            {                                
+                                var url = $"https://api.frankfurter.app/latest?from={item.From}&to={item.To}";                                
+                                // Handle BTC
+                                if ((item.From == "BTC" 
+                                    && item.To != "USD") 
+                                    || (item.From != "USD"
+                                        && item.To == "BTC")
+                                    )
+                                {
+                                    if(item.From == "BTC")
+                                        url = $"https://api.frankfurter.app/latest?from=USD&to={item.To}";
+                                    if (item.To== "BTC")
+                                        url = $"https://api.frankfurter.app/latest?from=USD&to={item.From}";
+                                }
+                                if((item.From == "BTC" 
+                                    && item.To == "USD") 
+                                    || (
+                                        item.To == "USD" 
+                                        && item.From == "BTC")
+                                       )
+                                {
+                                    // use rates from coindesk 
+                                }
+                                else
+                                {
+                                    var request = (HttpWebRequest)WebRequest.Create(url);
+                                    request.Method = "GET";
+                                    var response = (HttpWebResponse)request.GetResponse();
+                                    using (new StreamReader(response.GetResponseStream()))
+                                    {
+                                        var responsestring = new StreamReader(response.GetResponseStream()).ReadToEnd();
+                                        var currency = JsonConvert.DeserializeObject<Models.Currency>(responsestring);
+                                        if (item.To == "BTC")
+                                            item.Rate = currency.GetRate(item.From);
+                                        else
+                                            item.Rate = currency.GetRate(item.To);
+                                        item.Created = DateTime.Parse(currency.date);
+                                    }
                                 }
                                 cache.Add(item);
-                                
                             }                            
                         }
                         catch (Exception e)
@@ -133,30 +178,78 @@ namespace Wox.Plugin.Currency
                         
 
                     }
-                    var amount = ((double)(_money * item.Rate)).ToString();
-                    return new List<Result>()
+                    var amount = ((double)(_money * item.Rate)).ToString("C2");
+
+                    if (item.BtcRate == 0)
                     {
-                        new Result
+                        return new List<Result>()
                         {
-                            Title = $"{_money} {_fromCurrency} = {amount} {_toCurrency}",
-                            IcoPath = "Images/bank.png",
-                            SubTitle = $"Enter to copy. Source: https://frankfurter.app (Updated {item.Created.ToString("yyyy-MM-dd")})",
-                            Score = 100,
-                            Action = c =>
+                            new Result
                             {
-                                try
+                                Title = $"{_money} {_fromCurrency} = {amount} {_toCurrency}",
+                                IcoPath = "Images/bank.png",
+                                SubTitle = $"Enter to copy. Source: https://frankfurter.app (Updated {item.Created.ToString("yyyy-MM-dd")})",
+                                Score = 100,
+                                Action = c =>
                                 {
-                                    Clipboard.SetText(amount);
-                                    return true;
-                                }
-                                catch (ExternalException)
-                                {
-                                    MessageBox.Show("Copy failed, please try later");
-                                    return false;
+                                    try
+                                    {
+                                        Clipboard.SetText(amount);
+                                        return true;
+                                    }
+                                    catch (ExternalException)
+                                    {
+                                        MessageBox.Show("Copy failed, please try later");
+                                        return false;
+                                    }
                                 }
                             }
+                        };
+                    } 
+                    else
+                    {
+                        if(item.To == "USD" )
+                        {
+                            amount = ((double)(_money * item.BtcRate)).ToString("C2");
+                        } 
+                        else if (item.From == "USD") // 10 USD to BTC
+                        {
+                            amount = ((double)(_money / item.BtcRate)).ToString("C2");
                         }
-                    };
+                        else if (item.To == "BTC")
+                        {
+                            amount = ((double)((_money / item.Rate) / item.BtcRate)).ToString("C2");
+                        }
+                        else
+                        {
+                            amount = ((double)(_money * item.Rate * item.BtcRate)).ToString("C2");
+                        }
+                        
+                        return new List<Result>()
+                        {
+                            new Result
+                            {
+                                Title = $"{_money} {_fromCurrency} = {amount} {_toCurrency}",
+                                IcoPath = "Images/Bitcoin.png",
+                                SubTitle = $"Enter to copy. Source: https://api.coindesk.com (Updated {item.Created.ToString("yyyy-MM-dd")})",
+                                Score = 100,
+                                Action = c =>
+                                {
+                                    try
+                                    {
+                                        Clipboard.SetText(amount);
+                                        return true;
+                                    }
+                                    catch (ExternalException)
+                                    {
+                                        MessageBox.Show("Copy failed, please try later");
+                                        return false;
+                                    }
+                                }
+                            }
+                        };
+                    }
+                    
                 }
             }
             catch
