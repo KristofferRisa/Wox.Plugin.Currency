@@ -36,8 +36,7 @@ namespace Wox.Plugin.Currency
 
         public void Init(PluginInitContext context)
         {
-            this.Context = context;
-            
+            this.Context = context;            
             viewModel = new SettingsViewModel();
             settings = viewModel.Settings;
         }
@@ -68,12 +67,41 @@ namespace Wox.Plugin.Currency
 
                     if (IsTwoWayConversion(query.RawQuery))
                     {
-                        _toCurrency = query.RawQuery.Split(' ')[3].ToUpper();                        
+                        _toCurrency = query.RawQuery.Split(' ')[3].ToUpper();   
+                        
+                        if(_fromCurrency == "SAT"
+                            && _toCurrency == "BTC")
+                        {
+                            var convertedSat = _money / 100000000;
+                            return new List<Result>()
+                            {
+                                new Result
+                                {
+                                    Title = $"{_money} {_fromCurrency} = {convertedSat} {_toCurrency}",
+                                    IcoPath = "Images/Bitcoin.png",
+                                    SubTitle = $"1 bitcoin = 100,000,000 satoshis",
+                                    Score = 100,
+                                    Action = c =>
+                                    {
+                                        try
+                                        {
+                                            Clipboard.SetText(convertedSat.ToString());
+                                            return true;
+                                        }
+                                        catch (ExternalException)
+                                        {
+                                            MessageBox.Show("Copy failed, please try later");
+                                            return false;
+                                        }
+                                    }
+                                }
+                            };
+                        }
                     }
 
-                    if (!Enum.IsDefined(
-                           typeof(RateList),
-                           _toCurrency))
+                    // exits if not to or from currency is in the supported enum list
+                    if (!Enum.IsDefined(typeof(RateList),_toCurrency) 
+                        || !Enum.IsDefined(typeof(RateList),_fromCurrency))
                         return new List<Result>();
 
                     var item = new CacheItem()
