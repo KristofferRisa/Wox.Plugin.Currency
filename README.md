@@ -1,5 +1,8 @@
 # Wox Currency Converter plugin
 
+> **⚠️ This repository is archived and no longer maintained.**
+> The project is kept available for reference, but no further updates, bug fixes, or pull requests will be accepted. Feel free to fork it if you'd like to continue development.
+
 Convert any currency quickly & easily with the Wox smart currency converter - perfect for travelers, business professionals and personal use. It also support converting Bitcoin! 
 
 ## Smart
